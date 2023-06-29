@@ -1,0 +1,34 @@
+from Bio.PDB import PDBParser, PDBIO
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
+import warnings
+
+def assign_chain_names(pdb_file, chain_names, output_file):
+    # Create a PDB parser
+    parser = PDBParser(QUIET=True)
+
+    # Suppress warnings about blank chain IDs
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", PDBConstructionWarning)
+
+        # Parse the PDB file
+        structure = parser.get_structure('input', pdb_file)
+
+        # Get the first model in the structure
+        model = structure[0]
+
+        # Iterate over chains in the model and assign chain names
+        for chain, chain_name in zip(model, chain_names):
+            chain.id = chain_name
+
+    # Save the modified structure to a new PDB file
+    io = PDBIO()
+    io.set_structure(structure)
+    io.save(output_file)
+
+# Provide the input PDB file path, list of chain names, and output file path
+pdb_file = 'input.pdb'
+chain_names = ['A', 'B', 'C']  # Specify the desired chain names
+output_file = 'output.pdb'
+
+# Call the function to assign chain names
+assign_chain_names(pdb_file, chain_names, output_file)
